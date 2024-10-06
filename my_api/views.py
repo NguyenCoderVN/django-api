@@ -1,4 +1,5 @@
 import json
+from json import JSONDecodeError
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
@@ -15,15 +16,20 @@ def menu_items(request):
         return JsonResponse({"books": list(list_book)})
 
     elif request.method == 'POST':
-        post_dict = json.loads(request.body)
-        title = post_dict["title"]
-        price = post_dict["price"]
-        featured = post_dict["featured"]
-        item = MenuItems(title=title, price=price, featured=featured)
         try:
+            post_dict = json.loads(request.body)
+            title = post_dict["title"]
+            price = post_dict["price"]
+            featured = post_dict["featured"]
+            item = MenuItems(title=title, price=price, featured=featured)
             item.save()
-        except IntegrityError:
-            return JsonResponse({'error': 'true', 'message': 'required field missing'}, status=400)
+        except JSONDecodeError as e:
+            return JsonResponse({"Json payload error": str(e)})
+        except KeyError:
+            return JsonResponse(
+                data={'message': f'Json payload must have all fields'})
+        except ValidationError as e:
+            return JsonResponse({'message': f'{e}'})
 
         return JsonResponse(model_to_dict(item), status=201)
 
@@ -41,17 +47,18 @@ def menu_item(request, pk):
             return JsonResponse(dict_item, status=200)
 
         case 'PUT':
-            dict_put = json.loads(request.body)
-            for key in dict_item:
-                if key != 'id':
-                    try:
-                        setattr(item, key, dict_put[key])
-                    except KeyError:
-                        return JsonResponse(
-                            data={'message': f'Json payload must have all fields'},
-                            status=401)
             try:
+                dict_put = json.loads(request.body)
+                for key in dict_item:
+                    if key != 'id':
+                        setattr(item, key, dict_put[key])
                 item.save()
+            except JSONDecodeError as e:
+                return JsonResponse({"Json payload error": str(e)})
+            except KeyError:
+                return JsonResponse(
+                    data={'message': f'Json payload must have all fields'},
+                    status=401)
             except ValidationError as e:
                 return JsonResponse(
                     data={'message': f'{e}'},
@@ -60,11 +67,13 @@ def menu_item(request, pk):
             return JsonResponse({f"Successfully update id {pk}": model_to_dict(item)}, status=201)
 
         case 'PATCH':
-            dict_patch = json.loads(request.body)
             try:
+                dict_patch = json.loads(request.body)
                 for key, value in dict_patch.items():
                     setattr(item, key, value)
                 item.save()
+            except JSONDecodeError as e:
+                return JsonResponse({"Json payload error": str(e)})
             except Exception as e:
                 return JsonResponse({'message': f'{e}'}, status=401)
 
