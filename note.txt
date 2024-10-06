@@ -1,3 +1,13 @@
+pipenv install
+pipenv shell
+
 python manage.py makemigrations my_api
 python manage.py migrate my_api
 python manage.py loaddata menu_items
+
+POST DATA
+{
+	"title": "Noodles05",
+	"price": "20",
+	"featured": "1"
+}
