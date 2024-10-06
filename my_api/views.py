@@ -30,6 +30,7 @@ def menu_items(request):
 def menu_item(request, pk):
     try:
         item = MenuItems.objects.get(pk=pk)
+        dict_item = model_to_dict(item)
     except Exception as e:
         return JsonResponse({'message': f'{e}'}, status=404)
 
@@ -40,12 +41,11 @@ def menu_item(request, pk):
         case 'PUT':
             try:
                 post_dict = json.loads(request.body)
-                item.title = post_dict["title"]
-                item.price = post_dict["price"]
-                item.featured = post_dict["featured"]
+                for key, value in post_dict.items():
+                    setattr(item, key, value)
                 item.save()
             except Exception as e:
-                return JsonResponse({'message': f'Must have all fields (title, price, featured) {e}'},
+                return JsonResponse({'message': f'Must have all fields {e}'},
                                     status=401)
 
             return JsonResponse({f"Successfully update id {pk}": model_to_dict(item)}, status=201)
