@@ -1,7 +1,9 @@
 import json
+
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.forms import model_to_dict
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import MenuItems
 
@@ -36,26 +38,35 @@ def menu_item(request, pk):
 
     match request.method:
         case 'GET':
-            return JsonResponse({model_to_dict(item)}, status=200)
+            return JsonResponse(dict_item, status=200)
 
         case 'PUT':
+            dict_put = json.loads(request.body)
+            for key in dict_item:
+                if key != 'id':
+                    try:
+                        setattr(item, key, dict_put[key])
+                    except KeyError:
+                        return JsonResponse(
+                            data={'message': f'Json payload must have all fields'},
+                            status=401)
             try:
-                post_dict = json.loads(request.body)
-                for key, value in post_dict.items():
-                    setattr(item, key, value)
                 item.save()
-            except Exception as e:
-                return JsonResponse({'message': f'Must have all fields {e}'},
-                                    status=401)
+            except ValidationError as e:
+                return JsonResponse(
+                    data={'message': f'{e}'},
+                    status=400)
 
             return JsonResponse({f"Successfully update id {pk}": model_to_dict(item)}, status=201)
 
         case 'PATCH':
-            post_dict = json.loads(request.body)
-            item.title = post_dict.get("title", item.title)
-            item.price = post_dict.get("price", item.price)
-            item.featured = post_dict.get("featured", item.featured)
-            item.save()
+            dict_patch = json.loads(request.body)
+            try:
+                for key, value in dict_patch.items():
+                    setattr(item, key, value)
+                item.save()
+            except Exception as e:
+                return JsonResponse({'message': f'{e}'}, status=401)
 
             return JsonResponse({f"Successfully partial update id {pk}": model_to_dict(item)}, status=201)
 
