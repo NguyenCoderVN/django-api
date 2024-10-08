@@ -38,7 +38,7 @@ def menu_item(request, pk):
         item = MenuItems.objects.get(pk=pk)
         dict_item = model_to_dict(item)
     except MenuItems.DoesNotExist as e:
-         return JsonResponse({'message': f'{e}'}, status=404)
+        return JsonResponse({'message': f'{e}'}, status=404)
 
     match request.method:
         case 'GET':
