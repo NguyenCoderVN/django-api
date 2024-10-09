@@ -1,5 +1,6 @@
 import json
 from json import JSONDecodeError
+from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from django.core.exceptions import ValidationError
 from django.forms import model_to_dict
 from .models import MenuItems
@@ -11,9 +12,17 @@ class MenuItemList(APIView):
 
     @staticmethod
     def get(request):
-        items = MenuItems.objects.all().values()
+        item_count = MenuItems.objects.filter(featured=False).count()
+        content = {'not_done': item_count}
 
-        return Response({"books": list(items)})
+        return Response(content)
+
+
+    # @staticmethod
+    # def get(request):
+    #     items = MenuItems.objects.all().values()
+    #
+    #     return Response({"books": list(items)})
 
     @staticmethod
     def post(request):
@@ -36,6 +45,7 @@ class MenuItemList(APIView):
 
 
 class MenuItem(APIView):
+    renderer_classes = [JSONRenderer, BrowsableAPIRenderer, ]
 
     @staticmethod
     def get(request, pk):
