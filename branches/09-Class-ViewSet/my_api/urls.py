@@ -1,7 +1,5 @@
-from django.urls import path
+from rest_framework.routers import SimpleRouter
 from . import views
-
-urlpatterns = [
-    path('menu-items', views.MenuItemsView.menu_items, name='menu-items'),
-    path('menu-items/<int:pk>', views.MenuItemsView.menu_item, name='menu-item'),
-]
+router = SimpleRouter(trailing_slash=False)
+router.register('menu-items', views.MenuItemsView, basename='menu-items')
+urlpatterns = router.urls
