@@ -4,7 +4,7 @@ If (Test-Path db.sqlite3) {
 
 }
 If (Test-Path tutorials/quickstart/migrations) {
-    Remove-Item tutorials/quickstart/migrations -Recurse -Force -Confirm:$false
+    Remove-Item snippets/quickstart/migrations/0*.* -Recurse -Force -Confirm:$false
     Write-Host "migrations removed"
 }
 python manage.py makemigrations
