@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 django = "*"
 djangorestframework = "*"
+pygments = "*"
+httpie = "*"
 
 [dev-packages]
 
