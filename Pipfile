@@ -8,6 +8,7 @@ django = "*"
 djangorestframework = "*"
 pygments = "*"
 httpie = "*"
+django-guardian = "*"
 
 [dev-packages]
 
