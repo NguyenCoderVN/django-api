@@ -8,7 +8,7 @@ from my_permissions.serializers import MessageSerializer
 
 
 class MessageViewSet(viewsets.ModelViewSet):
-    permission_classes = [DjangoObjectPermissions]  # class changed
+    # permission_classes = [DjangoObjectPermissions]  # class changed
 
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
