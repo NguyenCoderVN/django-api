@@ -10,6 +10,7 @@ pygments = "*"
 httpie = "*"
 django-guardian = "*"
 djoser = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 
