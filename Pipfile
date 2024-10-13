@@ -11,6 +11,7 @@ httpie = "*"
 django-guardian = "*"
 djoser = "*"
 djangorestframework-simplejwt = "*"
+django-oauth-toolkit = "*"
 
 [dev-packages]
 
